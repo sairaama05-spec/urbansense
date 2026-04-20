@@ -33,11 +33,20 @@ jobs:
       # ── install project requirements (skip GPU-specific packages) ─────────────
       - name: Install project requirements
         run: |
-          # Strip GPU-only packages that won't install on the CPU runner
-          grep -vE "^(onnxruntime-gpu|torch==|torchvision==)" requirements.txt \
+          # lapx provides prebuilt linear-assignment wheels (bytetracker dep)
+          pip install lapx
+
+          # Strip GPU-only / already-installed packages
+          grep -vE "^(onnxruntime-gpu|torch==|torchvision==|#|$)" requirements.txt \
             > requirements-ci.txt
           pip install -r requirements-ci.txt
-          pip install onnxruntime   # CPU ONNX runtime
+
+          # CPU ONNX runtime (replaces onnxruntime-gpu stripped above)
+          pip install onnxruntime
+
+          # bytetracker: best-effort — tests mock it if install fails
+          pip install bytetracker || echo "bytetracker unavailable, tests will use mock"
+
           pip install pytest pytest-cov
 
       # ── run test suite ────────────────────────────────────────────────────────

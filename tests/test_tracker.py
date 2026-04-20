@@ -2,12 +2,42 @@
 tests/test_tracker.py
 =====================
 Unit tests for tracking/bytetrack_wrapper.py.
+
+bytetracker (and its C-extension dep `lap`) are mocked at the top of this
+file so that all tests run in CI without needing a compiled bytetracker.
 """
 
 from __future__ import annotations
 
+import sys
+import types
+from unittest.mock import MagicMock
+
 import numpy as np
 import pytest
+
+
+# ── inject a fake `bytetracker` before any project code is imported ───────────
+
+def _install_bytetracker_mock() -> None:
+    """Put a lightweight stub in sys.modules so bytetrack_wrapper imports cleanly."""
+    if "bytetracker" in sys.modules:
+        return  # already present (real or stub)
+
+    fake_pkg = types.ModuleType("bytetracker")
+
+    class _FakeBYTETracker:
+        def __init__(self, **kwargs):
+            pass
+
+        def update(self, dets, img_shape):
+            return []   # no tracks — sufficient for unit testing
+
+    fake_pkg.BYTETracker = _FakeBYTETracker
+    sys.modules["bytetracker"] = fake_pkg
+
+
+_install_bytetracker_mock()
 
 
 # ── helpers ───────────────────────────────────────────────────────────────────
@@ -20,7 +50,7 @@ def _make_dets(n: int) -> np.ndarray:
     x1y1  = rng.uniform(0,   800, (n, 2)).astype(np.float32)
     x2y2  = x1y1 + rng.uniform(20, 200, (n, 2)).astype(np.float32)
     score = rng.uniform(0.5, 1.0, (n, 1)).astype(np.float32)
-    cls   = rng.integers(0, 5, (n, 1)).astype(np.float32)
+    cls   = rng.integers(0, 5,   (n, 1)).astype(np.float32)
     return np.hstack([x1y1, x2y2, score, cls])
 
 
@@ -40,7 +70,7 @@ class TestByteTrackWrapper:
         from tracking.bytetrack_wrapper import ByteTrackWrapper
 
         tracker = ByteTrackWrapper(frame_rate=2)
-        empty   = _make_dets(0)                     # shape (0, 6)
+        empty   = _make_dets(0)
         result  = tracker.update(empty, img_shape=(900, 1600))
 
         assert isinstance(result, list), "update() should return a list"

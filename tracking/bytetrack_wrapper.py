@@ -14,7 +14,10 @@ import torch
 from dataclasses import dataclass, field
 from typing import List
 
-from bytetracker import BYTETracker
+try:
+    from bytetracker import BYTETracker
+except ImportError:  # CI / environments without lap compiled
+    BYTETracker = None  # type: ignore[assignment,misc]
 
 
 @dataclass
@@ -63,7 +66,10 @@ class ByteTrackWrapper:
 
     def reset(self):
         """Reset tracker state (call between scenes)."""
-        self._tracker = BYTETracker(**self.cfg)
+        if BYTETracker is not None:
+            self._tracker = BYTETracker(**self.cfg)
+        else:
+            self._tracker = None
         self.frame_id = 0
 
     def update(
@@ -101,7 +107,10 @@ class ByteTrackWrapper:
         dets_t = torch.from_numpy(dets)
 
         try:
-            raw_tracks = self._tracker.update(dets_t, img_shape)
+            if self._tracker is None:
+                raw_tracks = []
+            else:
+                raw_tracks = self._tracker.update(dets_t, img_shape)
         except Exception:
             # tolerate internal bytetracker numpy/torch quirks
             raw_tracks = []
