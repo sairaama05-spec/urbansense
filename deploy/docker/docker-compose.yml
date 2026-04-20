@@ -1,0 +1,49 @@
+version: "3.9"
+
+# ── UrbanSense – Docker Compose ───────────────────────────────────────────────
+# GPU passthrough requires:  nvidia-container-toolkit installed on the host
+# Start with:  docker compose up --build
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  urbansense:
+    build:
+      context: ../..          # project root
+      dockerfile: deploy/docker/Dockerfile
+    image: urbansense:latest
+    container_name: urbansense
+
+    # ── port mapping ─────────────────────────────────────────────────────────
+    ports:
+      - "8501:8501"
+
+    # ── data volume (keeps dataset outside the image) ─────────────────────────
+    volumes:
+      - ./../../data:/app/data:ro        # read-only mount of nuScenes data
+
+    # ── GPU passthrough ───────────────────────────────────────────────────────
+    runtime: nvidia
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - CUDA_VISIBLE_DEVICES=0
+
+    # ── resource limits ───────────────────────────────────────────────────────
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+    # ── restart policy ────────────────────────────────────────────────────────
+    restart: unless-stopped
+
+    # ── healthcheck (mirrors Dockerfile HEALTHCHECK) ──────────────────────────
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
