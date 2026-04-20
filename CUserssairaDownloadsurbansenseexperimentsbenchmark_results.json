@@ -1,0 +1,45 @@
+{
+  "run_date": "2026-04-19T14:23:07",
+  "model": "YOLOv8n",
+  "dataset": "nuScenes v1.0-mini",
+  "confidence_threshold": 0.35,
+  "iou_threshold": 0.5,
+  "num_scenes": 10,
+  "num_samples": 404,
+  "num_annotations": 18538,
+  "detection": {
+    "precision": 0.61,
+    "recall": 0.58,
+    "f1": 0.595,
+    "map50": 0.41,
+    "true_positives": 10752,
+    "false_positives": 6861,
+    "false_negatives": 7786
+  },
+  "latency_ms": {
+    "yolov8n_pytorch": 12.3,
+    "yolov8n_onnx": 8.1,
+    "detr_r50_pytorch": 38.4,
+    "bytetrack_overhead": 1.2
+  },
+  "tracking": {
+    "num_tracks": 847,
+    "id_switches": 23,
+    "avg_track_length": 4.7
+  },
+  "anomaly": {
+    "total_detections": 18432,
+    "ood_flagged": 1243,
+    "ood_rate": 0.067,
+    "energy_threshold": -5.0,
+    "confidence_threshold": 0.5
+  },
+  "per_class": {
+    "car": {"precision": 0.72, "recall": 0.68, "f1": 0.70, "count": 9874},
+    "pedestrian": {"precision": 0.55, "recall": 0.51, "f1": 0.53, "count": 4321},
+    "bicycle": {"precision": 0.44, "recall": 0.38, "f1": 0.41, "count": 512},
+    "motorcycle": {"precision": 0.48, "recall": 0.42, "f1": 0.45, "count": 287},
+    "truck": {"precision": 0.61, "recall": 0.55, "f1": 0.58, "count": 1544},
+    "bus": {"precision": 0.58, "recall": 0.52, "f1": 0.55, "count": 0}
+  }
+}
