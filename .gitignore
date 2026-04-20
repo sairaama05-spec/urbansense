@@ -5,7 +5,7 @@ __pycache__/
 .env
 venv/
 
-# Data — too large for git
+# Data (too large for git)
 data/
 *.pt
 *.onnx
@@ -14,24 +14,10 @@ data/
 # Streamlit
 .streamlit/
 
-# IDE
-.vscode/
-.idea/
-
-# OS
+# Misc
 .DS_Store
-Thumbs.db
-
-# Packaging
 *.egg-info/
 dist/
 build/
-
-# Test / coverage
 .pytest_cache/
-.coverage
-htmlcov/
-
-# Weights & Biases
 wandb/
-runs/

@@ -42,7 +42,7 @@ jobs:
 
       # ── run test suite ────────────────────────────────────────────────────────
       - name: Run pytest
-        run: pytest tests/ -v --tb=short
+        run: PYTHONPATH=. pytest tests/ -v --tb=short
 
       # ── upload coverage (optional, non-blocking) ──────────────────────────────
       - name: Upload coverage report
