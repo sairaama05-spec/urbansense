@@ -1,4 +1,9 @@
-from transformers import DetrImageProcessor, DetrForObjectDetection
+try:
+    from transformers import DetrImageProcessor, DetrForObjectDetection
+except ImportError:  # CI / environments without transformers installed
+    DetrImageProcessor = None       # type: ignore[assignment,misc]
+    DetrForObjectDetection = None   # type: ignore[assignment,misc]
+
 import torch
 
 

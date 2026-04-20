@@ -44,6 +44,9 @@ jobs:
           # CPU ONNX runtime (replaces onnxruntime-gpu stripped above)
           pip install onnxruntime
 
+          # transformers: best-effort — tests mock it if install fails
+          pip install "transformers>=4.30,<6" || echo "transformers unavailable, tests will use mock"
+
           # bytetracker: best-effort — tests mock it if install fails
           pip install bytetracker || echo "bytetracker unavailable, tests will use mock"
 
